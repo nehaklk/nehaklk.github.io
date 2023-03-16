@@ -1,0 +1,34 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "2.40.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_container_registry" "acr-dev"{
+    name = "acrdevregistrycloudacademylab001"
+    location = "West US"
+    sku = "Standard"
+    admin_enabled = false
+    resource_group_name      = "cal-3766-ca7"
+    provisioner "local-exec"{
+        when = destroy
+        command = <<EOT
+            az acr repository delete  --name ${self.name} --image hello-world:calab --yes
+        EOT
+    }
+}
+
+resource "null_resource" "image"{
+    provisioner "local-exec"{
+        command = <<EOT
+            az acr import --name ${azurerm_container_registry.acr-dev.name} --source docker.io/library/hello-world:latest --image hello-world:calab
+        EOT
+    }
+}
