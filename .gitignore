@@ -3,4 +3,4 @@
 terraform.tfstate
 mykey.pub
 mykey.pem
-'\.pub'
+'\\.pub'
